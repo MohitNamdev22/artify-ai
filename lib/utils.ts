@@ -76,7 +76,7 @@ export function removeKeysFromQuery({
   searchParams,
   keysToRemove,
 }: RemoveUrlQueryParams) {
-  const currentUrl = qs.parse(searchParams.toString()) as Record<string, any>;
+  const currentUrl = qs.parse(searchParams.toString()) as Record<string, unknown>;
 
   keysToRemove.forEach((key) => {
     delete currentUrl[key];
@@ -90,11 +90,11 @@ export function removeKeysFromQuery({
 }
 
 // DEBOUNCE FUNCTION
-export const debounce = (func: (...args: any[]) => void, delay: number) => {
+export const debounce = (func: (...args: unknown[]) => void, delay: number) => {
   let timeoutId: ReturnType<typeof setTimeout> | null;
-  return (...args: any[]) => {
+  return (...args: unknown[]) => {
     if (timeoutId) clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(null, args), delay);
+    timeoutId = setTimeout(() => func(...args), delay);
   };
 };
 
@@ -118,34 +118,19 @@ export const getImageSize = (
 // DOWNLOAD FUNCTION
 export const download = async (url: string, filename: string) => {
   if (!url) throw new Error("Resource URL not provided!");
-  
+
   try {
     const response = await fetch(url);
     const blob = await response.blob();
     const blobURL = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = blobURL;
-    a.download = filename.replace(" ", "_") + ".png";
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobURL);
   } catch (error) {
-    console.error("Error downloading file:", error);
+    handleError(error);
   }
-};
-
-// DEEP MERGE FUNCTION
-export const deepMergeObjects = (obj1: Record<string, any>, obj2: Record<string, any>) => {
-  if (!obj2) return obj1;
-
-  const output = { ...obj2 };
-
-  for (let key in obj1) {
-    if (Object.prototype.hasOwnProperty.call(obj1, key)) {
-      output[key] =
-        obj1[key] && typeof obj1[key] === "object" && obj2[key] && typeof obj2[key] === "object"
-          ? deepMergeObjects(obj1[key], obj2[key])
-          : obj1[key];
-    }
-  }
-  return output;
 };

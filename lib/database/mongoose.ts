@@ -7,25 +7,31 @@ interface MongooseConnection {
     promise: Promise<Mongoose> | null;
 }
 
-
-let cached: MongooseConnection = (global as any).mongoose
-
-if(!cached){
-    cached = (global as any).mongoose = {
-        conn: null, promise: null
-    }
+// Define a custom type for the global object to include mongoose
+interface GlobalWithMongoose {
+    mongoose?: MongooseConnection;
 }
 
-export const connectToDatabase = async()=>{
-    if(cached.conn) return cached.conn;
+// Use const since cached is never reassigned
+const cached: MongooseConnection = (global as unknown as GlobalWithMongoose).mongoose || { conn: null, promise: null };
 
-    if(!MONGODB_URL) throw new Error('missing mongodburl')
+if (!cached) {
+    (global as unknown as GlobalWithMongoose).mongoose = {
+        conn: null,
+        promise: null
+    };
+}
 
-    cached.promise = 
-    cached.promise ||
-    mongoose.connect(MONGODB_URL, {
-        dbName:'artifyai', bufferCommands:false
-    })
+export const connectToDatabase = async () => {
+    if (cached.conn) return cached.conn;
+
+    if (!MONGODB_URL) throw new Error('missing mongodburl');
+
+    cached.promise =
+        cached.promise ||
+        mongoose.connect(MONGODB_URL, {
+            dbName: 'artifyai', bufferCommands: false
+        });
 
     cached.conn = await cached.promise;
 
