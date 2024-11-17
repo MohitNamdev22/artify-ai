@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input"
 import { CustomField } from "./CustomField"
 import { useState } from "react"
 import { AspectRatioKey } from "@/lib/utils"
+import { Button } from "../ui/button"
 
 export const formSchema = z.object({
     title: z.string(),
@@ -37,11 +38,13 @@ export const formSchema = z.object({
 })
 
 
-const TransformationForm = ({ action, data = null, userId, type, creditBalance }: TransformationFormProps) => {
+const TransformationForm = ({ action, data = null, userId, type, creditBalance, config = null }: TransformationFormProps) => {
 
     const transformationType = transformationTypes[type];
-    const [image, setImage] = useState(data)
-    const [newTransformation, setNewTransformation] = useState<Transformations | null>(null);
+    const [image, setImage] = useState(data);
+    const [isSubmitting, setisSubmitting] = useState(false);
+    const [isTransforming, setisTransforming] = useState(false);
+    const [transformationConfig, setTransformationConfig] = useState(config);
     const initialValues = data && action === 'Update' ? {
         title: data?.title,
         aspectRatio: data?.aspectRatio,
@@ -157,6 +160,10 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance }
                         )}
                     </div>
                 )}
+                <Button type="submit"
+                className="submit-button capitalize"
+                disabled={isSubmitting}
+                >Submit</Button>
             </form>
         </Form>
     )
