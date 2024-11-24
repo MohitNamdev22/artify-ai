@@ -67,7 +67,17 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
     }
 
     const onSelectFieldHandler = (value:string, onChangeField: (value:string) => void) => {
+        const imageSize = aspectRatioOptions[value as AspectRatioKey]
 
+        setImage((prevState: any)=>({
+            ...prevState,
+            aspectRatio: imageSize.aspectRatio,
+            width: imageSize.width,
+            height: imageSize.height,
+        }))
+
+        setNewTransformation(transformationType.config);
+        return onChangeField(value);
     }
 
     const onInputChangeHandler = (fieldName: string, value: string, type: string, onChangeField: (value: string) => void) =>{
@@ -181,7 +191,7 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
                 >{isSubmitting ? 'Submitting...' : 'Save Image'}</Button>
                 </div>
             </form>
-        </Form>
+        </Form> 
     )
 }
 
