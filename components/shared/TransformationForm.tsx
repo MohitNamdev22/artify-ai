@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { transformationTypes } from '@/constants'
+import { debounce } from "@/lib/utils"
 
 import {
     Select,
@@ -81,8 +82,19 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
     }
 
     const onInputChangeHandler = (fieldName: string, value: string, type: string, onChangeField: (value: string) => void) =>{
+        debounce(()=>{
+            setNewTransformation((prevState: any)=>({
+                ...prevState,
+                [type]:{
+                    ...prevState?.[type],
+                    [fieldName === 'prompt' ? 'prompt' : 'to']: value
+                }
+        }))
 
-    }
+        return onChangeField(value);
+
+    }, 1000);
+}
 
     const onTransformHandler = () =>{
 
