@@ -24,6 +24,15 @@ const TransformedImage = ({image, type, title, transformationConfig, isTransform
             </button>
         )}
       </div>
+      {image?.publicId && transformationConfig ? (
+        <div className="relative">
+
+        </div>
+      ):(
+        <div className="transformed-placeholder">
+            Transformed Image
+        </div>
+      )}
     </div>
   )
 }
