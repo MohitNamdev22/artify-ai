@@ -1,6 +1,6 @@
 "use client"
 
-import { aspectRatioOptions, defaultValues } from "@/constants"
+import { aspectRatioOptions, creditFee, defaultValues } from "@/constants"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -111,7 +111,7 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
         setNewTransformation(null)
 
         startTransition(async ()=>{
-            // await updateCredits()
+            await updateCredits(userId, -1)
 
         })
 
