@@ -134,3 +134,26 @@ export const download = async (url: string, filename: string) => {
     handleError(error);
   }
 };
+
+export const deepMergeObjects = (obj1:any, obj2: any) =>{
+  let output = {...obj1};
+
+  for(let key in obj2) {
+    if(obj2.hasOwnProperty(key)){
+      if(
+        obj1[key] && 
+        typeof obj1[key] === "object" && 
+      obj2[key] && 
+      typeof obj2[key] === "object"
+      ) {
+        output[key] = deepMergeObjects(obj1[key], obj2[key]);
+      } else{
+        output[key] = obj2[key];
+      }
+      
+    }
+  }
+  return output;
+  
+
+}

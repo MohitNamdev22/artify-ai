@@ -5,7 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { transformationTypes } from '@/constants'
-import { debounce } from "@/lib/utils"
+import { debounce } from "@/lib/utils" 
+import { deepMergeObjects } from "@/lib/utils"
 
 import {
     Select,
@@ -26,9 +27,10 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { CustomField } from "./CustomField"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { AspectRatioKey } from "@/lib/utils"
 import { Button } from "../ui/button"
+import { updateCredits } from "@/lib/actions/user.actions"
 
 export const formSchema = z.object({
     title: z.string(),
@@ -43,10 +45,11 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
 
     const transformationType = transformationTypes[type];
     const [image, setImage] = useState(data);
-    const [isSubmitting, setisSubmitting] = useState(false);
-    const [isTransforming, setisTransforming] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isTransforming, setIsTransforming] = useState(false);
     const [transformationConfig, setTransformationConfig] = useState(config);
     const [newTransformation, setNewTransformation] = useState<Transformations | null>(null);
+    const [isPending, startTransition] = useTransition()
     const initialValues = data && action === 'Update' ? {
         title: data?.title,
         aspectRatio: data?.aspectRatio,
@@ -96,7 +99,19 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
     }, 1000);
 }
 
-    const onTransformHandler = () =>{
+    const onTransformHandler = async () =>{
+        setIsTransforming(true)
+
+        setTransformationConfig(
+            deepMergeObjects(newTransformation, transformationConfig)
+        )
+
+        setNewTransformation(null)
+
+        startTransition(async ()=>{
+            // await updateCredits()
+
+        })
 
     }
 
