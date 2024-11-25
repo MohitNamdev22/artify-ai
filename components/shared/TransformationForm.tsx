@@ -7,6 +7,7 @@ import { z } from "zod"
 import { transformationTypes } from '@/constants'
 import { debounce } from "@/lib/utils" 
 import { deepMergeObjects } from "@/lib/utils"
+import { useEffect } from "react"
 
 import {
     Select,
@@ -36,6 +37,7 @@ import TransformedImage from "./TransformedImage"
 import { getCldImageUrl } from "next-cloudinary"
 import { addImage, updateImage } from "@/lib/actions/image.action"
 import { useRouter } from "next/navigation"
+import { InsufficientCreditsModal } from "./InsufficientCreditsModal"
 
 export const formSchema = z.object({
     title: z.string(),
@@ -177,15 +179,23 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
         setNewTransformation(null)
 
         startTransition(async ()=>{
-            await updateCredits(userId, -1)
+            await updateCredits(userId, creditFee)
 
         })
 
     }
 
+    useEffect(()=>{
+        if(image && (type === 'restore' || type === 'removeBackground')) {
+            setNewTransformation(transformationType.config)
+        }
+        
+    }, [image, transformationType.config, type])
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                {creditBalance < Math.abs(creditFee) && <InsufficientCreditsModal/>}
                 <CustomField
                     control={form.control}
                     name="title"
