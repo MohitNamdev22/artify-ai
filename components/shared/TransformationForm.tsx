@@ -31,6 +31,7 @@ import { useState, useTransition } from "react"
 import { AspectRatioKey } from "@/lib/utils"
 import { Button } from "../ui/button"
 import { updateCredits } from "@/lib/actions/user.actions"
+import MediaUploader from "./MediaUploader"
 
 export const formSchema = z.object({
     title: z.string(),
@@ -203,6 +204,24 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
                         )}
                     </div>
                 )}
+
+                <div className="media-uploader-field">
+                    <CustomField
+                    control={form.control}
+                    name="publicId"
+                    className="flex size-full flex-col"
+                    render={({field})=>(
+                        <MediaUploader
+                            onValueChange={field.onChange}
+                            setImage={setImage}
+                            publicId={field.value}
+                            image={image}
+                            type={type}  
+                        />
+                    )}
+                    />
+                </div>
+
                 <div className="flex flex-col gap-4">
                 <Button type="submit"
                 className="submit-button capitalize"
