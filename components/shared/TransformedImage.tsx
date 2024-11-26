@@ -49,7 +49,7 @@ const TransformedImage = ({image, type, title, transformationConfig, isTransform
                         onError={()=>{
                             debounce(()=>{
                                 setIsTransforming && setIsTransforming(false);
-                            }, 8000)
+                            }, 8000)()
                         }}
                         onLoad={()=>{
                                 setIsTransforming && setIsTransforming(false);
@@ -63,8 +63,11 @@ const TransformedImage = ({image, type, title, transformationConfig, isTransform
                             src="/assets/icons/spinner.svg"
                             width={50}
                             height={50}
-                            alt="Transforming"
+                            alt="spinner"
                             />
+                            <p className="text-white">
+                              Please wait...
+                            </p>
                             </div>
       )}
         </div>
