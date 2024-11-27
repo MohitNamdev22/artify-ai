@@ -7,7 +7,7 @@ import Image from "next/image";
 import { dataUrl, getImageSize } from "@/lib/utils";
 import { PlaceholderValue } from "next/dist/shared/lib/get-img-props";
 import { CldImage } from "next-cloudinary";
-
+//@ts-ignore
 type MediaUploaderProps = {
     onValueChange: (valule: string) => void;
     setImage: React.Dispatch<any>;

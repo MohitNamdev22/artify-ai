@@ -19,12 +19,6 @@ import {
 
 import {
     Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { CustomField } from "./CustomField"
@@ -70,6 +64,8 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
         resolver: zodResolver(formSchema),
         defaultValues: initialValues,
     })
+
+    console.log(isPending);
 
     const router = useRouter();
 

@@ -14,7 +14,7 @@ import { formSchema } from "./TransformationForm";
 
 type CustomFieldProps = {
   control: Control<z.infer<typeof formSchema>> | undefined;
-  render: (props: { field: any }) => React.ReactNode;
+  render: (props: { field: { value: any; onChange: (value: any) => void; onBlur: () => void } }) => React.ReactNode;
   name: keyof z.infer<typeof formSchema>;
   formLabel?: string;
   className?: string;
