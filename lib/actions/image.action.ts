@@ -6,17 +6,32 @@ import { handleError } from "../utils";
 import User from "../database/models/user.model";
 import Image from "../database/models/image.model";
 import { redirect } from "next/navigation";
-import { model } from "mongoose";
 import { v2 as cloudinary } from 'cloudinary';
+
+// Define types for better type safety
+interface PopulatedImage {
+  _id: string;
+  author: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    clerkId: string;
+  };
+  [key: string]: any;
+}
+
+interface CloudinaryResource {
+  public_id: string;
+  [key: string]: any;
+}
 
 const populateUser = (query: any) => query.populate({
     path: 'author',
     model: User,
     select:'_id firstName lastName clerkId'
-})
+});
 
 //Add image
-
 export async function addImage({image, userId, path}: AddImageParams){
     try {
         await connectToDatabase();
@@ -36,8 +51,9 @@ export async function addImage({image, userId, path}: AddImageParams){
 
         return JSON.parse(JSON.stringify(newImage));
     } catch (error) {
-        handleError(error)
-        
+        handleError(error);
+        // Explicitly return null to handle potential undefined return
+        return null;
     }
 }
 
@@ -61,8 +77,8 @@ export async function updateImage({image, userId, path}: UpdateImageParams){
 
         return JSON.parse(JSON.stringify(updatedImage));
     } catch (error) {
-        handleError(error)
-        
+        handleError(error);
+        return null;
     }
 }
 
@@ -74,8 +90,7 @@ export async function deleteImage(imageId: string){
         await Image.findByIdAndDelete(imageId);
 
     } catch (error) {
-        handleError(error)
-        
+        handleError(error);
     } finally{
         redirect('/')
     }
@@ -92,8 +107,8 @@ export async function getImageById(imageId: string){
         
         return JSON.parse(JSON.stringify(image));
     } catch (error) {
-        handleError(error)
-        
+        handleError(error);
+        return null;
     }
 }
 
@@ -120,9 +135,9 @@ export async function getAllImages({limit = 9, page = 1, searchQuery = ''}: {
         }
 
         const { resources } = await cloudinary.search.expression(expression).execute();
-        const resourceIds = resources.map((resources: any)=> resources.public_id);
+        const resourceIds = resources.map((resource: CloudinaryResource) => resource.public_id);
 
-        let query={};
+        let query: Record<string, unknown> = {};
         if(searchQuery){
             query = {
                 publicId: {
@@ -145,8 +160,8 @@ export async function getAllImages({limit = 9, page = 1, searchQuery = ''}: {
         }
 
     } catch (error) {
-        handleError(error)
-        
+        handleError(error);
+        return null;
     }
 }
 
@@ -177,5 +192,22 @@ export async function getUserImages({
       };
     } catch (error) {
       handleError(error);
+      return null;
     }
   }
+
+// Remove the unused import to address the ESLint warning
+// const unusedModel = model; // Uncomment if you need to reference the model
+
+// Add type definitions if not already defined elsewhere
+interface AddImageParams {
+  image: Record<string, any>;
+  userId: string;
+  path: string;
+}
+
+interface UpdateImageParams {
+  image: { _id: string } & Record<string, any>;
+  userId: string;
+  path: string;
+}
