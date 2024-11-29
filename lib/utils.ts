@@ -1,5 +1,3 @@
-/* eslint-disable prefer-const */
-/* eslint-disable no-prototype-builtins */
 import { type ClassValue, clsx } from "clsx";
 import qs from "qs";
 import { twMerge } from "tailwind-merge";
@@ -50,7 +48,6 @@ const toBase64 = (str: string) =>
 export const dataUrl = `data:image/svg+xml;base64,${toBase64(
   shimmer(1000, 1000)
 )}`;
-// ==== End
 
 // FORM URL QUERY
 export const formUrlQuery = ({
@@ -85,19 +82,29 @@ export function removeKeysFromQuery({
 }
 
 // DEBOUNCE
-export const debounce = (func: (...args: any[]) => void, delay: number) => {
-  let timeoutId: NodeJS.Timeout | null;
-  return (...args: any[]) => {
+export const debounce = <T extends (...args: any[]) => void>(
+  func: T, 
+  delay: number
+) => {
+  let timeoutId: NodeJS.Timeout | null = null;
+  return (...args: Parameters<T>) => {
     if (timeoutId) clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(null, args), delay);
+    timeoutId = setTimeout(() => func(...args), delay);
   };
 };
 
-// GE IMAGE SIZE
+// GET IMAGE SIZE
 export type AspectRatioKey = keyof typeof aspectRatioOptions;
+
+interface ImageWithDimensions {
+  aspectRatio?: AspectRatioKey;
+  width?: number;
+  height?: number;
+}
+
 export const getImageSize = (
   type: string,
-  image: any,
+  image: ImageWithDimensions,
   dimension: "width" | "height"
 ): number => {
   if (type === "fill") {
@@ -131,12 +138,15 @@ export const download = (url: string, filename: string) => {
 };
 
 // DEEP MERGE OBJECTS
-export const deepMergeObjects = (obj1: any, obj2: any) => {
+export const deepMergeObjects = <T extends Record<string, any>, U extends Record<string, any>>(
+  obj1: T, 
+  obj2: U | null | undefined
+): T | U => {
   if(obj2 === null || obj2 === undefined) {
     return obj1;
   }
 
-  let output = { ...obj2 };
+  let output: Record<string, any> = { ...obj2 };
 
   for (let key in obj1) {
     if (obj1.hasOwnProperty(key)) {
@@ -153,5 +163,16 @@ export const deepMergeObjects = (obj1: any, obj2: any) => {
     }
   }
 
-  return output;
+  return output as T | U;
 };
+
+interface FormUrlQueryParams {
+  searchParams: URLSearchParams;
+  key: string;
+  value: string | number | null;
+}
+
+interface RemoveUrlQueryParams {
+  searchParams: string;
+  keysToRemove: string[];
+}
