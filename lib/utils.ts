@@ -69,20 +69,20 @@ export function removeKeysFromQuery({
 }: RemoveUrlQueryParams) {
   const currentUrl = qs.parse(searchParams);
 
-  keysToRemove.forEach((key) => {
-    delete currentUrl[key];
+  keysToRemove.forEach((removeKey) => {
+    delete currentUrl[removeKey];
   });
 
   // Remove null or undefined values
   Object.keys(currentUrl).forEach(
-    (key) => currentUrl[key] == null && delete currentUrl[key]
+    (removeKey) => currentUrl[removeKey] == null && delete currentUrl[removeKey]
   );
 
   return `${window.location.pathname}?${qs.stringify(currentUrl)}`;
 }
 
 // DEBOUNCE
-export const debounce = <T extends (...args: any[]) => void>(
+export const debounce = <T extends (...args: unknown[]) => void>(
   func: T, 
   delay: number
 ) => {
@@ -138,34 +138,41 @@ export const download = (url: string, filename: string) => {
 };
 
 // DEEP MERGE OBJECTS
-export const deepMergeObjects = <T extends Record<string, any>, U extends Record<string, any>>(
+export const deepMergeObjects = <
+  T extends Record<string, unknown>, 
+  U extends Record<string, unknown> | null | undefined
+>(
   obj1: T, 
-  obj2: U | null | undefined
-): T | U => {
-  if(obj2 === null || obj2 === undefined) {
+  obj2: U
+): T | Exclude<U, null | undefined> => {
+  if (obj2 === null || obj2 === undefined) {
     return obj1;
   }
 
-  let output: Record<string, any> = { ...obj2 };
+  const output: Record<string, unknown> = { ...obj2 };
 
-  for (let key in obj1) {
-    if (obj1.hasOwnProperty(key)) {
+  for (const currentKey in obj1) {
+    if (Object.prototype.hasOwnProperty.call(obj1, currentKey)) {
       if (
-        obj1[key] &&
-        typeof obj1[key] === "object" &&
-        obj2[key] &&
-        typeof obj2[key] === "object"
+        obj1[currentKey] &&
+        typeof obj1[currentKey] === "object" &&
+        obj2[currentKey] &&
+        typeof obj2[currentKey] === "object"
       ) {
-        output[key] = deepMergeObjects(obj1[key], obj2[key]);
+        output[currentKey] = deepMergeObjects(
+          obj1[currentKey] as Record<string, unknown>, 
+          obj2[currentKey] as Record<string, unknown>
+        );
       } else {
-        output[key] = obj1[key];
+        output[currentKey] = obj1[currentKey];
       }
     }
   }
 
-  return output as T | U;
+  return output as T | Exclude<U, null | undefined>;
 };
 
+// Add type definitions for parameters used in the file
 interface FormUrlQueryParams {
   searchParams: URLSearchParams;
   key: string;
