@@ -77,6 +77,8 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
         defaultValues: initialValues,
     })
 
+    console.log(isPending);
+
     const router = useRouter();
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
