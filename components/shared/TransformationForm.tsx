@@ -41,16 +41,28 @@ export const formSchema = z.object({
     publicId: z.string(),
 })
 
+// Define interfaces for improved type safety
+interface ImageState {
+    publicId?: string;
+    width?: number;
+    height?: number;
+    secureURL?: string;
+    aspectRatio?: string;
+}
 
+interface TransformationConfig {
+    [key: string]: {
+        [subKey: string]: string | number;
+    };
+}
 
 const TransformationForm = ({ action, data = null, userId, type, creditBalance, config = null }: TransformationFormProps) => {
-
     const transformationType = transformationTypes[type];
-    const [image, setImage] = useState(data);
+    const [image, setImage] = useState<ImageState | null>(data);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isTransforming, setIsTransforming] = useState(false);
-    const [transformationConfig, setTransformationConfig] = useState(config);
-    const [newTransformation, setNewTransformation] = useState<Transformations | null>(null);
+    const [transformationConfig, setTransformationConfig] = useState<TransformationConfig | null>(config);
+    const [newTransformation, setNewTransformation] = useState<TransformationConfig | null>(null);
     const [isPending, startTransition] = useTransition()
     const initialValues = data && action === 'Update' ? {
         title: data?.title,
@@ -65,11 +77,8 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
         defaultValues: initialValues,
     })
 
-    console.log(isPending);
-
     const router = useRouter();
 
-    // 2. Define a submit handler.
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
         
@@ -136,36 +145,39 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
         console.log(values)
     }
 
-    const onSelectFieldHandler = (value:string, onChangeField: (value:string) => void) => {
+    const onSelectFieldHandler = (value: string, onChangeField: (value: string) => void) => {
         const imageSize = aspectRatioOptions[value as AspectRatioKey]
 
-        setImage((prevState: any)=>({
+        setImage((prevState: ImageState | null) => prevState ? ({
             ...prevState,
             aspectRatio: imageSize.aspectRatio,
             width: imageSize.width,
             height: imageSize.height,
-        }))
+        }) : null)
 
         setNewTransformation(transformationType.config);
         return onChangeField(value);
     }
 
-    const onInputChangeHandler = (fieldName: string, value: string, type: string, onChangeField: (value: string) => void) =>{
-        debounce(()=>{
-            setNewTransformation((prevState: any)=>({
+    const onInputChangeHandler = (
+        fieldName: string, 
+        value: string, 
+        transformType: string, 
+        onChangeField: (value: string) => void
+    ) => {
+        debounce(() => {
+            setNewTransformation((prevState) => ({
                 ...prevState,
-                [type]:{
-                    ...prevState?.[type],
+                [transformType]: {
+                    ...prevState?.[transformType],
                     [fieldName === 'prompt' ? 'prompt' : 'to']: value
                 }
-        }))
+            }))
+        }, 1000)();
+        return onChangeField(value);
+    }
 
-        
-    }, 1000)();
-    return onChangeField(value);
-}
-
-    const onTransformHandler = async () =>{
+    const onTransformHandler = async () => {
         setIsTransforming(true)
 
         setTransformationConfig(
@@ -174,19 +186,17 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
 
         setNewTransformation(null)
 
-        startTransition(async ()=>{
+        startTransition(async () => {
             await updateCredits(userId, creditFee)
-
         })
-
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         if(image && (type === 'restore' || type === 'removeBackground')) {
             setNewTransformation(transformationType.config)
         }
-        
     }, [image, transformationType.config, type])
+
 
     return (
         <Form {...form}>
