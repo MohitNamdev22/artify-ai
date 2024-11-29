@@ -48,7 +48,7 @@ interface UserImagesParams extends ImageQueryParams {
 }
 
 // Typed version of populate function
-const populateUser = (query: Document<unknown, {}, IImage>) => 
+const populateUser = <T extends Document>(query: T) => 
   query.populate<{ author: IUser }>({
     path: 'author',
     model: User,
@@ -141,7 +141,7 @@ export async function getImageById(imageId: string) {
   try {
     await connectToDatabase();
 
-    const image = await populateUser(Image.findById(imageId) as Document<unknown, {}, IImage>);
+    const image = await populateUser(Image.findById(imageId) as Document);
 
     if (!image) throw new Error("Image not found");
     
@@ -186,7 +186,7 @@ export async function getAllImages({
 
     const skipAmount = (Number(page) - 1) * limit;
 
-    const images = await populateUser(Image.find(query) as Document<unknown, {}, IImage>)
+    const images = await populateUser(Image.find(query) as Document)
       .sort({ updatedAt: -1 })
       .skip(skipAmount)
       .limit(limit);
@@ -216,7 +216,7 @@ export async function getUserImages({
 
     const skipAmount = (Number(page) - 1) * limit;
 
-    const images = await populateUser(Image.find({ author: userId }) as Document<unknown, {}, IImage>)
+    const images = await populateUser(Image.find({ author: userId }) as Document)
       .sort({ updatedAt: -1 })
       .skip(skipAmount)
       .limit(limit);
