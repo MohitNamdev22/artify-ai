@@ -5,19 +5,10 @@ import Image from 'next/image'
 import { Collection } from '@/components/shared/Collection'
 import { getAllImages } from '@/lib/actions/image.action'
 
-// Define the SearchParamProps interface
-interface SearchParamProps {
-  searchParams: {
-    page?: string;
-    query?: string;
-  }
-}
-
 const Home = async ({ searchParams }: SearchParamProps) => {
   const page = Number(searchParams?.page) || 1;
   const searchQuery = (searchParams?.query as string) || '';
   const images = await getAllImages({page, searchQuery})
-  
   return (
     <>
       <section className="home">
