@@ -4,24 +4,11 @@ import React from 'react'
 import Image from 'next/image'
 import { Collection } from '@/components/shared/Collection'
 import { getAllImages } from '@/lib/actions/image.action'
-import { Metadata } from 'next'
+import { PageProps } from '@/.next/types/app/(root)/layout'
 
-// Define metadata for the page
-export const metadata: Metadata = {
-  title: 'Artify AI - Unleash Your Creativity',
-}
-
-// Use the explicit Next.js PageProps type
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: { 
-    page?: string; 
-    query?: string;
-  }
-}) {
-  const page = Number(searchParams?.page) || 1;
-  const searchQuery = (searchParams?.query as string) || '';
+const Home = async ({ searchParams }: PageProps) => {
+  const page = Number(await Promise.resolve(searchParams?.page)) || 1;
+  const searchQuery = (await Promise.resolve(searchParams?.query as string)) || '';
   const images = await getAllImages({page, searchQuery})
   
   return (
@@ -55,3 +42,5 @@ export default async function Home({
     </>
   )
 }
+
+export default Home
