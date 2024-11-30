@@ -15,6 +15,7 @@ const Home = async ({ params, searchParams }: SearchParamProps) => {
   const page = Number(searchParams?.page) || 1;
   const searchQuery = (searchParams?.query as string) || '';
   const images = await getAllImages({ page, searchQuery });
+  console.log(params);
 
   return (
     <>
