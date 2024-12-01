@@ -5,8 +5,15 @@ import Image from 'next/image'
 import { Collection } from '@/components/shared/Collection'
 import { getAllImages } from '@/lib/actions/image.action'
 
-// Option 1: Use an underscore to explicitly ignore the unused params
-const Home = async ({ params: _, searchParams }: SearchParamProps) => {
+// Define the type without the params if they're not used
+const Home = async ({ 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  params, 
+  searchParams 
+}: { 
+  params: unknown; 
+  searchParams: { page?: string; query?: string } 
+}) => {
   const page = Number(searchParams?.page) || 1;
   const searchQuery = (searchParams?.query as string) || '';
   const images = await getAllImages({ page, searchQuery });
