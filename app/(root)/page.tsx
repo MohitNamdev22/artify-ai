@@ -5,17 +5,22 @@ import Image from 'next/image'
 import { Collection } from '@/components/shared/Collection'
 import { getAllImages } from '@/lib/actions/image.action'
 
-// Update the SearchParamProps interface to include both params and searchParams
-declare type SearchParamProps = {
-  params: { id: string; type: TransformationTypeKey };
-  searchParams: { page?: string; query?: string };
+// Revised type definition for SearchParamProps
+type SearchParamProps = {
+  params: { 
+    // Update this to match what Next.js expects for dynamic routes
+    id?: string; 
+  };
+  searchParams: { 
+    page?: string; 
+    query?: string; 
+  };
 };
 
 const Home = async ({ params, searchParams }: SearchParamProps) => {
   const page = Number(searchParams?.page) || 1;
   const searchQuery = (searchParams?.query as string) || '';
   const images = await getAllImages({ page, searchQuery });
-  console.log(params);
 
   return (
     <>
