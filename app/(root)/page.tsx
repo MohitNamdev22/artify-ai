@@ -5,19 +5,8 @@ import Image from 'next/image'
 import { Collection } from '@/components/shared/Collection'
 import { getAllImages } from '@/lib/actions/image.action'
 
-// Revised type definition for SearchParamProps
-type SearchParamProps = {
-  params: { 
-    // Update this to match what Next.js expects for dynamic routes
-    id?: string; 
-  };
-  searchParams: { 
-    page?: string; 
-    query?: string; 
-  };
-};
-
-const Home = async ({ params, searchParams }: SearchParamProps) => {
+// Option 1: Use an underscore to explicitly ignore the unused params
+const Home = async ({ params: _, searchParams }: SearchParamProps) => {
   const page = Number(searchParams?.page) || 1;
   const searchQuery = (searchParams?.query as string) || '';
   const images = await getAllImages({ page, searchQuery });
