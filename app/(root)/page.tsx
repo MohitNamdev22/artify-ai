@@ -5,18 +5,11 @@ import Image from 'next/image'
 import { Collection } from '@/components/shared/Collection'
 import { getAllImages } from '@/lib/actions/image.action'
 
-// Define the type without the params if they're not used
-const Home = async ({ 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  params, 
-  searchParams 
-}: { 
-  params: unknown; 
-  searchParams: { page?: string; query?: string } 
-}) => {
-  const page = Number(searchParams?.page) || 1;
+const Home = async ({ params, searchParams }: SearchParamProps) => {
+  const page = Number(searchParams?.page ?? 1);
   const searchQuery = (searchParams?.query as string) || '';
   const images = await getAllImages({ page, searchQuery });
+  console.log(params);
 
   return (
     <>
