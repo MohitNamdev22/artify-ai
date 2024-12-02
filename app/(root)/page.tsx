@@ -1,16 +1,22 @@
-import { navLinks } from '@/constants';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Collection } from '@/components/shared/Collection';
-import { getAllImages } from '@/lib/actions/image.action';
+import { auth } from "@clerk/nextjs/server";
+import Image from "next/image";
+import { redirect } from "next/navigation";
+
+import { Collection } from "@/components/shared/Collection";
+import Header from "@/components/shared/Header";
+import { getUserImages } from "@/lib/actions/image.action";
+import { getUserById } from "@/lib/actions/user.actions";
+import { navLinks } from "@/constants";
+import Link from "next/link";
 
 const Home = async ({ searchParams }: SearchParamProps) => {
-  // Parse search params
-  const page = Number(searchParams?.page ?? 1);
-  const searchQuery = (searchParams?.query as string) || '';
+  const page = Number(searchParams?.page) || 1;
+  const { userId } = await auth();
 
-  // Fetch images
-  const images = await getAllImages({ page, searchQuery });
+  if (!userId) redirect("/sign-in");
+
+  const user = await getUserById(userId);
+  const images = await getUserImages({ page, userId: user._id });
 
   return (
     <>
@@ -36,7 +42,7 @@ const Home = async ({ searchParams }: SearchParamProps) => {
         <Collection
           hasSearch={true}
           images={images?.data}
-          totalPages={images?.totalPage}
+          totalPages={images?.totalPages}
           page={page}
         />
       </section>
