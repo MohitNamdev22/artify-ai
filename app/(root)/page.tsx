@@ -13,7 +13,6 @@ const Home = async ({ searchParams }: SearchParamProps) => {
   const { userId } = await auth();
 
   if (!userId) redirect("/sign-in");
-
   const user = await getUserById(userId);
   const images = await getUserImages({ page, userId: user._id });
 
