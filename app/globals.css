@@ -320,7 +320,7 @@
   }
 
   .sidebar-nav {
-    @apply h-full flex-col justify-between md:flex md:gap-4;
+    @apply h-full flex-col w-max justify-between md:flex md:gap-4;
   }
 
   .sidebar-nav_elements {
